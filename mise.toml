@@ -1,0 +1,18 @@
+[tools]
+go = "latest"
+
+[tasks.build]
+description = "Build viz8 binary"
+dir = "cmd"
+run = "mkdir -p ../bin && go build -o ../bin/viz8 ."
+
+[tasks.install]
+description = "Install viz8 to ~/.local/bin"
+depends = ["build"]
+run = '''
+mkdir -p ~/.local/bin
+tmp="$(mktemp ~/.local/bin/viz8.XXXXXX)"
+cp bin/viz8 "$tmp"
+chmod 755 "$tmp"
+mv -f "$tmp" ~/.local/bin/viz8
+'''
