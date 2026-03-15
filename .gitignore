@@ -1,3 +1,4 @@
 .claude/*.local*
 .hq
+.playwright-cli/
 /bin/

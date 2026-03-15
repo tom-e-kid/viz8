@@ -31,8 +31,14 @@ func Parse(data []byte) (*Spec, error) {
 		return nil, fmt.Errorf("unsupported format: %q (expected %q)", spec.Format, FormatV1)
 	}
 	for i := range spec.Connections {
-		if spec.Connections[i].Style == "" {
-			spec.Connections[i].Style = DefaultStyle
+		c := &spec.Connections[i]
+		if c.Style == "" && c.Type != "" {
+			if t, ok := spec.Types[c.Type]; ok && t.Style != "" {
+				c.Style = t.Style
+			}
+		}
+		if c.Style == "" {
+			c.Style = DefaultStyle
 		}
 	}
 	return &spec, nil
