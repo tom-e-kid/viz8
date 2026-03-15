@@ -30,7 +30,7 @@ The tool opens the rendered diagram in your default browser.
 
 ## Format
 
-See [docs/viz8-v1.md](docs/viz8-v1.md) for the full specification.
+See [cmd/docs/viz8-v1.md](cmd/docs/viz8-v1.md) for the full specification.
 
 ```yaml
 format: viz8/v1

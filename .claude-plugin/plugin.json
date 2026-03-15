@@ -1,0 +1,5 @@
+{
+  "name": "viz8",
+  "version": "0.1.0",
+  "commands": "./plugin/commands"
+}
