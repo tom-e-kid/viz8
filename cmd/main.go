@@ -22,17 +22,35 @@ var subcommands = map[string]bool{
 }
 
 func main() {
-	if len(os.Args) < 2 {
+	args := os.Args[1:]
+
+	// Parse flags
+	var outputDir string
+	var remaining []string
+	for i := 0; i < len(args); i++ {
+		if args[i] == "-o" {
+			if i+1 >= len(args) {
+				fmt.Fprintln(os.Stderr, "Error: -o requires a directory argument")
+				os.Exit(1)
+			}
+			outputDir = args[i+1]
+			i++
+		} else {
+			remaining = append(remaining, args[i])
+		}
+	}
+
+	if len(remaining) == 0 {
 		printUsage()
 		os.Exit(0)
 	}
 
-	arg := os.Args[1]
+	arg := remaining[0]
 
 	switch arg {
 	case "help":
-		if len(os.Args) >= 3 {
-			printCommandHelp(os.Args[2])
+		if len(remaining) >= 2 {
+			printCommandHelp(remaining[1])
 		} else {
 			printUsage()
 		}
@@ -46,7 +64,7 @@ func main() {
 			printUsage()
 			os.Exit(1)
 		}
-		runOpen(arg)
+		runOpen(arg, outputDir)
 	}
 }
 
@@ -55,14 +73,14 @@ func looksLikeFile(s string) bool {
 	return strings.ContainsAny(s, "./")
 }
 
-func runOpen(path string) {
+func runOpen(path string, outputDir string) {
 	spec, err := internal.ParseFile(path)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 
-	htmlPath, err := internal.Render(spec, templateHTML, path)
+	htmlPath, err := internal.Render(spec, templateHTML, path, outputDir)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
@@ -77,19 +95,26 @@ func runOpen(path string) {
 }
 
 func printUsage() {
-	fmt.Print(`viz8 - Architecture and system visualization tool
+	defaultDir, err := internal.DefaultOutputDir()
+	if err != nil {
+		defaultDir = "~/.viz8/output"
+	}
+	fmt.Printf(`viz8 - Architecture and system visualization tool
 
 Usage:
-  viz8 <file.yaml>    Open a viz8/v1 YAML file in the browser
-  viz8 schema         Print the viz8/v1 format specification
-  viz8 help [command] Show help for a command
-  viz8 version        Print version
+  viz8 [options] <file.yaml>  Open a viz8/v1 YAML file in the browser
+  viz8 schema                 Print the viz8/v1 format specification
+  viz8 help [command]         Show help for a command
+  viz8 version                Print version
+
+Options:
+  -o <dir>  Output directory for generated HTML (default: %s)
 
 Examples:
-  viz8 arch.yaml                     # Visualize a YAML spec
-  viz8 .viz8/output/m-20260315.yaml  # Open from .viz8 output dir
-  viz8 schema                        # Show format spec (useful for AI agents)
-`)
+  viz8 arch.yaml             # Visualize a YAML spec
+  viz8 -o ./out arch.yaml    # Output HTML to ./out/
+  viz8 schema                # Show format spec (useful for AI agents)
+`, defaultDir)
 }
 
 func printCommandHelp(command string) {

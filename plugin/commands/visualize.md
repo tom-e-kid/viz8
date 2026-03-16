@@ -44,15 +44,15 @@ Based on the confirmed structure and the schema from Step 1:
 ### Step 5: Save the YAML file
 
 1. Determine the filename: `m-<yyyyMMdd>.yaml` using today's date
-2. If `.viz8/output/m-<yyyyMMdd>.yaml` already exists, append a suffix: `m-<yyyyMMdd>-2.yaml`, `m-<yyyyMMdd>-3.yaml`, etc.
-3. Create the `.viz8/output/` directory if it doesn't exist: `mkdir -p .viz8/output`
-4. Write the YAML to `.viz8/output/<filename>.yaml`
+2. If `~/.viz8/output/m-<yyyyMMdd>.yaml` already exists, append a suffix: `m-<yyyyMMdd>-2.yaml`, `m-<yyyyMMdd>-3.yaml`, etc.
+3. Create the directory if it doesn't exist: `mkdir -p ~/.viz8/output`
+4. Write the YAML to `~/.viz8/output/<filename>.yaml`
 
 ### Step 6: Open in browser
 
-Run `viz8 .viz8/output/<filename>.yaml` using the Bash tool.
+Run `viz8 ~/.viz8/output/<filename>.yaml` using the Bash tool.
 The command will:
-- Generate an HTML file alongside the YAML
+- Generate an HTML file in `~/.viz8/output/` (the default output directory)
 - Open it in the default browser
 - Print the `file://` URL to stdout
 

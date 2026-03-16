@@ -1,34 +1,51 @@
 package internal
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 )
 
 func TestOutputPath(t *testing.T) {
 	tests := []struct {
-		input string
-		want  string
+		input     string
+		outputDir string
+		want      string
 	}{
-		{"model.yaml", "model.html"},
-		{".viz8/output/m-20260315.yaml", ".viz8/output/m-20260315.html"},
-		{"path/to/spec.yml", "path/to/spec.html"},
-		{"file.json", "file.html"},
+		{"model.yaml", "/tmp/out", "/tmp/out/model.html"},
+		{".viz8/output/m-20260315.yaml", "/tmp/out", "/tmp/out/m-20260315.html"},
+		{"path/to/spec.yml", "/tmp/out", "/tmp/out/spec.html"},
+		{"file.json", "/tmp/out", "/tmp/out/file.html"},
 	}
 	for _, tt := range tests {
-		got, err := outputPath(tt.input)
+		got, err := outputPath(tt.input, tt.outputDir)
 		if err != nil {
-			t.Errorf("outputPath(%q) error: %v", tt.input, err)
+			t.Errorf("outputPath(%q, %q) error: %v", tt.input, tt.outputDir, err)
 			continue
 		}
 		if got != tt.want {
-			t.Errorf("outputPath(%q) = %q, want %q", tt.input, got, tt.want)
+			t.Errorf("outputPath(%q, %q) = %q, want %q", tt.input, tt.outputDir, got, tt.want)
 		}
 	}
 }
 
+func TestOutputPath_defaultDir(t *testing.T) {
+	defaultDir, err := DefaultOutputDir()
+	if err != nil {
+		t.Fatalf("DefaultOutputDir() error: %v", err)
+	}
+	want := filepath.Join(defaultDir, "model.html")
+	got, err := outputPath("model.yaml", "")
+	if err != nil {
+		t.Fatalf("outputPath error: %v", err)
+	}
+	if got != want {
+		t.Errorf("outputPath with default dir = %q, want %q", got, want)
+	}
+}
+
 func TestOutputPath_noExtension(t *testing.T) {
-	_, err := outputPath("noext")
+	_, err := outputPath("noext", "/tmp/out")
 	if err == nil {
 		t.Fatal("expected error for file without extension")
 	}
